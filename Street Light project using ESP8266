@@ -1,6 +1,10 @@
 hello guys this is Harsh Mishra 
 From zero to this 
 i created this project using ESP8266 i built a smart city street light project 
+using NTP server client communication i made this 
+fetching  real time data through UDP 
+And also communication and read write with the IC 74HC595.
+Set IP for changes manually.
 
 here is my code 
 
