@@ -101,9 +101,9 @@ void loop() {
   }
 }
 void turnOnAllLEDs() {
-  leds = B11111111; 
+  leds = B11111111;      //ye to jante hi hoge...............?
   digitalWrite(latchPin, LOW); 
-  shiftOut(dataPin, clockPin, MSBFIRST, leds); 
+  shiftOut(dataPin, clockPin, MSBFIRST, leds);   //MSB and LSB padha hai ki nhi...........?
   digitalWrite(latchPin, HIGH); 
 }
 
