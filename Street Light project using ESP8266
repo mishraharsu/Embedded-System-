@@ -1,0 +1,111 @@
+hello guys this is Harsh Mishra 
+From zero to this 
+i created this project using ESP8266 i built a smart city street light project 
+
+here is my code 
+
+
+#include <ESP8266WiFi.h>   //to make connection of esp8266 with wifi
+#include <WiFiUdp.h>      //makes udp connection
+#include <NTPClient.h>    // NTP server for time zone 
+#include <TimeLib.h>      //Real time Configuration
+
+const char* ssid = "SSID";  //your SSID
+const char* password = "Password";  //Your Password
+
+// Initialization of IC 74HC595.
+const int latchPin = 16;  //connect IC 74HC595 latch pin with esp8266 GPIO.
+const int clockPin = 14;    //connect IC 74HC595 clock pin with esp8266 GPIO
+const int dataPin = 12;     //connect IC 74HC595 data pin with esp8266 GPIO
+byte leds = 0; 
+int currentLed = 0;
+const int ledCount = 6;     //number of led connected and count.
+int i;
+
+WiFiUDP ntpUDP;
+NTPClient timeClient(ntpUDP, "pool.ntp.org", 19800);  // set time zone for india
+
+//set millis function.
+unsigned long previousMillis = 0;
+const long interval = 1000;
+
+//Set on-off duration of lights. 
+const int onHour = 14;
+const int onMinute = 10;
+const int offHour = 14;
+const int offMinute = 11;
+
+void setup() {  
+  Serial.begin(115200);  //initialization
+
+//wait for wifi connection.
+  WiFi.begin(ssid, password);
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(1000);
+    Serial.println("Connecting to WiFi...");
+  }
+
+  timeClient.begin();
+
+  pinMode(latchPin, OUTPUT);
+  pinMode(clockPin, OUTPUT);
+  pinMode(dataPin, OUTPUT);
+}
+
+void loop() {
+  unsigned long currentMillis = millis();
+
+  if (currentMillis - previousMillis >= interval) {
+    previousMillis = currentMillis;
+
+    timeClient.update();
+
+    unsigned long currentEpochTime = timeClient.getEpochTime();  //set epoch time                         //want to know epoch ---google it..
+
+    int currentHour = hour(currentEpochTime);
+    int currentMinute = minute(currentEpochTime);
+      int currentSecond = second(currentEpochTime);
+      String meridian = hour(currentEpochTime) < 12 ? "AM" : "PM";
+
+    Serial.print("Current Time (India): ");
+    Serial.print(currentHour);
+    Serial.print(":");
+    if (currentMinute < 10) {
+      Serial.print("0");
+    }
+   Serial.print(currentMinute);
+   Serial.print(":");
+   if (currentSecond < 10) {
+      Serial.print("0"); 
+  }
+    Serial.print(currentSecond);
+    Serial.print(" ");
+    Serial.println(meridian);
+
+//statement to on street lights.
+    if (currentHour == onHour && currentMinute == onMinute){
+    turnOnAllLEDs();
+    Serial.println("Light ON");
+    
+    }
+
+//Statements to off street lights.
+    if (currentHour == offHour && currentMinute == offMinute){
+    turnOffAllLEDs();
+    Serial.println("Light OFF");
+    }
+  }
+}
+void turnOnAllLEDs() {
+  leds = B11111111; 
+  digitalWrite(latchPin, LOW); 
+  shiftOut(dataPin, clockPin, MSBFIRST, leds); 
+  digitalWrite(latchPin, HIGH); 
+}
+
+void turnOffAllLEDs() {
+  leds = B00000000; 
+  digitalWrite(latchPin, LOW); 
+  shiftOut(dataPin, clockPin, MSBFIRST, leds);   
+  digitalWrite(latchPin, HIGH); 
+}
