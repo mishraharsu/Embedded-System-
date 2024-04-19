@@ -4,8 +4,8 @@
 #include <TimeLib.h>
 
 // Replace these with your WiFi credentials
-const char* ssid = "Harsh";
-const char* password = "Gaurav1238";
+const char* ssid = "SSID";
+const char* password = "PASSWORD";
 
 const int led = 2;
 const int buzzer = 5;
